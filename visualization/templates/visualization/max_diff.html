@@ -1,0 +1,36 @@
+
+{% block content %}
+<div id="container" style="width: 75%;">
+  <canvas id="bar-chart"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+<script>
+
+  var config = {
+    type: 'bar',
+    data: {
+      datasets: [
+        {
+            label: 'Difference in New Cases Before and After May',
+            data: {{ differences|safe }},
+            borderColor: '#7077ff',
+            backgroundColor: '#7077ff',
+            fill: false,
+        }
+      ],
+      labels: {{ labels|safe }}
+    },
+    options: {
+      responsive: true
+    }
+  };
+
+  window.onload = function() {
+    var ctx = document.getElementById('bar-chart').getContext('2d');
+    window.myLine = new Chart(ctx, config);
+  };
+
+</script>
+
+{% endblock %}

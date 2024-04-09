@@ -1,0 +1,53 @@
+
+{% block content %}
+<div id="container" style="width: 75%;">
+  <canvas id="radar-chart"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+<script>
+
+  var config = {
+    type: 'radar',
+    data: {
+      datasets: [
+        {
+            label: "Cases (in ten thousands)",
+            data: {{ cases|safe }},
+            borderColor: '#7077ff',
+            //backgroundColor: '#7077ff',
+        },
+        {
+            label: "Deaths (in thousands)",
+            data: {{ deaths|safe }},
+            borderColor: '#ff4242',
+            //backgroundColor: '#ff4242',
+        },
+        {
+            label: "Cases per Million",
+            data: {{ cases_per_million|safe }},
+            borderColor: 'green',
+            //backgroundColor: 'green',
+        },
+        {
+            label: "Deaths per Million * 100",
+            data: {{ deaths_per_million|safe }},
+            borderColor: 'purple',
+            //backgroundColor: 'purple',
+        }
+      ],
+      labels: {{ labels|safe }}
+    },
+    options: {
+      responsive: true
+    }
+  };
+
+  window.onload = function() {
+    var ctx = document.getElementById('radar-chart').getContext('2d');
+    window.myRadar = new Chart(ctx, config);
+  };
+
+</script>
+
+{% endblock %}

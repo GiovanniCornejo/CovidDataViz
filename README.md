@@ -23,6 +23,7 @@ Each page has its own data visualization and descripition.
 ## Dependencies
 
 - Python 3: Required for running the Python code.
+- pandas: Python data manipulation and analysis library for processing COVID-19 datasets.
 - Django: Python web framework used for backend structure and serving web pages for COVID-19 data visualization.
 
 ## Installation
@@ -35,7 +36,7 @@ Each page has its own data visualization and descripition.
 2. Start up the Django application:
    ```bash
    python manage.py migrate
-   pthon manage.py runserver
+   python manage.py runserver
    ```
 3. Visit the development server in a browser of your choice.
 

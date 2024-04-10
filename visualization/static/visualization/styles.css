@@ -1,9 +1,18 @@
 .head,
-.description {
-  padding-left: 1rem;
+.description,
+.form {
+  margin-left: 1rem;
 }
 
 .graph {
   width: 70%;
   margin: 0 auto;
+}
+.graph--small {
+  width: 65%;
+}
+
+.form {
+  display: flex;
+  align-items: center;
 }

@@ -1,40 +1,76 @@
+{% extends "visualization/layout.html" %}
 
-<form action="/positive_rates/" method="post">
-  {% csrf_token %}
-  {{ form }}
-  <input type="submit" value="Submit">
-</form>
+{% block heading %}Positive Rates{% endblock heading %}
+{% block description %}
+    A pie chart visualization to compare the top 5 countries with the highest total cases and the average 
+    positive rate in those countries for the specified month.
+{% endblock description %}
 
 {% block content %}
-<div id="container" style="width: 75%;">
-  <canvas id="pie-chart"></canvas>
+<form action="{% url 'positive_rates' %}" method="post" class="form">
+    {% csrf_token %}
+    <div class="form-row">
+        <div class="col">
+            <label for="id_month">{{ form.month.label }}</label>
+            {{ form.month }}
+        </div>
+        <div class="col-auto">
+            <input type="submit" value="Submit" class="btn btn-primary">
+        </div>
+    </div>
+</form>
+
+{% if form.errors %}
+    <div class="alert alert-danger mt-2">
+        {% for error_key, error_value in form.errors.items %}
+            {% for error_message in error_value %}
+                {{ error_message }}
+            {% endfor %}
+        {% endfor %}
+    </div>
+{% endif %}
+
+<div id="container" class="graph graph--small">
+    <canvas id="pie-chart"></canvas>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
 <script>
-
-  var config = {
-    type: 'pie',
-    data: {
-      datasets: [{
-        data: {{ positive_rates|safe }},
-        backgroundColor: [
-          '#696969', '#808080', '#A9A9A9', '#C0C0C0', '#D3D3D3'
-        ],
-        label: 'Total Cases'
-      }],
-      labels: {{ labels|safe }}
-    },
-    options: {
-      responsive: true
-    }
-  };
-
-  window.onload = function() {
-    var ctx = document.getElementById('pie-chart').getContext('2d');
-    window.myPie = new Chart(ctx, config);
-  };
-
+    var config = {
+        type: 'pie',
+        data: {
+            datasets: [{
+                data: {{ positive_rates|safe }},
+                backgroundColor: [
+                    '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd'  
+                ],
+                label: 'Total Cases'
+            }],
+            labels: {{ labels|safe }}
+        },
+        options: {
+            responsive: true,
+            tooltips: {
+                callbacks: {
+                    label: function(tooltipItem, data) {
+                       var label = data.labels[tooltipItem.index] || ''; // Accessing label for the tooltip
+                        if (label) {
+                            label += ': ';
+                        }
+                        var dataset = data.datasets[tooltipItem.datasetIndex];
+                        var value = dataset.data[tooltipItem.index]; // Accessing data value
+                        label += parseFloat(value).toFixed(2) + '%'; // Round to 2 decimal points and add percentage sign
+                        return label;
+                    }
+                }
+            }
+        }
+    };
+    
+    window.onload = function() {
+        var ctx = document.getElementById('pie-chart').getContext('2d');
+        window.myPie = new Chart(ctx, config);
+    };
 </script>
 
 {% endblock %}

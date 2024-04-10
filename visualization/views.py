@@ -1,8 +1,10 @@
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
+from numpy import positive
+
+from .forms import MonthForm
 
 import pandas as pd
-import numpy as np
 
 # Store csv data globally
 covid_df = pd.read_csv("data/covid-data-10-16-20.csv")
@@ -121,6 +123,43 @@ def max_diff(request: HttpRequest) -> HttpResponse:
     })
 
 def positive_rates(request: HttpRequest) -> HttpResponse:
-    # TODO: Implement positive_rates view
-    print("TODO: Implement positive_rates view")
-    return render(request, "visualization/positive_rates.html")
+    """
+    Ask users to input a month in numeric format (e.g., March = 3). Then, generates a pie chart visualization to compare the 
+    top 5 countries with the highest total cases and find the average positive rate in those countries for the specified month.
+
+    Return:
+
+    `labels`: The country names.
+    `positive_rates`: The average positive rate in that month for each country (in percents, i.e., * 100)
+    """
+    if request.method == "POST":
+        form = MonthForm(request.POST)
+        if form.is_valid():
+            month: int = form.cleaned_data["month"]
+
+            # Filter out non-country locations and to current month
+            df = covid_df[(covid_df["location"] != "International") & (covid_df["location"] != "World") & (covid_df["month"] == month)] 
+
+            top5_countries = df.groupby("location")["total_cases"].max().nlargest(5)
+            
+            # Filter out countries with zero positive rates
+            top5_countries = top5_countries[top5_countries.index.isin(df[df["positive_rate"] > 0]["location"])]
+
+            average_positive_rates = []
+            for country in top5_countries.index:
+                positive_rates = df[df["location"] == country]["positive_rate"]   
+                average_positive_rates.append(positive_rates.mean() * 100)
+
+            # Render the template with the data
+            return render(request, "visualization/positive_rates.html", {
+                "form": form,
+                "labels": top5_countries.index.tolist(),
+                "positive_rates": average_positive_rates
+            })
+    else:
+        form = MonthForm()
+    
+    # If form is not valid or it's a GET request, render the form with errors or empty form
+    return render(request, "visualization/positive_rates.html", {
+        "form": form
+    })

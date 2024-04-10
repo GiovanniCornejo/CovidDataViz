@@ -2,20 +2,38 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 
 # Store csv data globally
-import csv
-def load_csv_data():
-    with open("data/covid-data-10-16-20.csv", 'r') as csvfile:
-        return [line for line in csv.DictReader(csvfile)]
-data = load_csv_data()
+import pandas as pd
+covid_df = pd.read_csv("data/covid-data-10-16-20.csv")
 
 # Create your views here.
 def home(request: HttpRequest) -> HttpResponse:
     return render(request, 'visualization/home.html')
 
 def us_cases(request: HttpRequest) -> HttpResponse:
-    # TODO: Implement us_cases view
-    print("TODO: Implement us_cases view")
-    return render(request, "visualization/us_cases.html")
+    """
+    Generate a double line graph visualization that plots the total and new number of COVID cases 
+    in the United States where data is available (no null values) over time.
+
+    Return:
+    `labels`: The dates for the data.
+    `total_cases`: Total number of cases for those dates.
+    `new_cases`: New number of cases for those dates. 
+    """
+    us_cases = covid_df[
+        (covid_df["iso_code"] == "USA") & covid_df["total_cases"] & covid_df["new_cases_smoothed"]
+    ]
+
+    dates = us_cases["date"].tolist()
+    total_cases = us_cases["total_cases"].tolist()
+    new_cases = us_cases["new_cases_smoothed"].tolist()
+
+    return render(request, "visualization/us_cases.html", 
+        context={ 
+            "labels": dates, 
+            "total_cases": total_cases,
+            "new_cases": new_cases
+        }
+    )
 
 def avg_cases_and_deaths(request: HttpRequest) -> HttpResponse:
     # TODO: Implement avg_cases_and_deaths view

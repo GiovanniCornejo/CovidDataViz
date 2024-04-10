@@ -1,6 +1,9 @@
+{% extends "visualization/layout.html" %}
+
+{% block heading %}US Cases{% endblock heading %}
 
 {% block content %}
-<div id="container" style="width: 75%;">
+<div id="container" class="graph">
   <canvas id="line-chart"></canvas>
 </div>
 
@@ -17,6 +20,7 @@
             borderColor: '#ff4242',
             backgroundColor: '#ff4242',
             fill: false,
+            yAxisID: 'totalYAxis'
         },
         {
             label: 'New Cases',
@@ -24,12 +28,40 @@
             borderColor: '#7077ff',
             backgroundColor: '#7077ff',
             fill: false,
+            yAxisID: 'newYAxis'
         }
       ],
       labels: {{ labels|safe }}
     },
     options: {
-      responsive: true
+      responsive: true,
+      scales: {
+        yAxes: [
+          {
+            id: 'totalYAxis',
+            type: 'linear',
+            position: 'left',
+            scaleLabel: {
+              display: true,
+              labelString: 'Total Cases',
+              fontColor: '#ff4242'
+            }
+          },
+          {
+            id: 'newYAxis',
+            type: 'linear',
+            position: 'right',
+            scaleLabel: {
+              display: true,
+              labelString: 'New Cases',
+              fontColor: '#7077ff'
+            },
+            gridLines: {
+              drawOnChartArea: false,
+            },
+          },
+        ]
+      }
     }
   };
 

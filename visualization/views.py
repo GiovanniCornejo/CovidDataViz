@@ -23,15 +23,11 @@ def us_cases(request: HttpRequest) -> HttpResponse:
         (covid_df["iso_code"] == "USA") & covid_df["total_cases"] & covid_df["new_cases_smoothed"]
     ]
 
-    dates = us_cases["date"].tolist()
-    total_cases = us_cases["total_cases"].tolist()
-    new_cases = us_cases["new_cases_smoothed"].tolist()
-
     return render(request, "visualization/us_cases.html", 
         context={ 
-            "labels": dates, 
-            "total_cases": total_cases,
-            "new_cases": new_cases
+            "labels": us_cases["date"].tolist(), 
+            "total_cases": us_cases["total_cases"].tolist(),
+            "new_cases": us_cases["new_cases_smoothed"].tolist()
         }
     )
 

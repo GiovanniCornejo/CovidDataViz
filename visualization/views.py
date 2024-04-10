@@ -67,9 +67,36 @@ def avg_cases_and_deaths(request: HttpRequest) -> HttpResponse:
     })
 
 def top5_radar(request: HttpRequest) -> HttpResponse:
-    # TODO: Implement top5_radar view
-    print("TODO: Implement top5_radar view")
-    return render(request, "visualization/top5_radar.html")
+    """
+    Generates a radar chart visualization to compare data of the top five
+    countries with the most total cases.
+
+    Return:
+    `label`: The country names.
+    `cases`: Total cases for each country (in ten thousands).
+    `deaths`: Total deaths for each country (in thousands).
+    `cases_per_million`: Cases per million.
+    `deaths_per_million`: Deaths per million * 100 for each country (for scaling).
+    """
+
+    # Filter out non-country locations
+    df = covid_df[(covid_df["location"] != "International") & (covid_df["location"] != "World")] 
+
+    total_country_data = df.groupby("location")[["total_cases", "total_deaths", "total_cases_per_million", "total_deaths_per_million"]].max()
+    top5_countries = total_country_data.nlargest(5, "total_cases")
+    
+    # Scale necessary columns
+    top5_countries["total_cases"] //= 10_000
+    top5_countries["total_deaths"] //= 1_000
+    top5_countries["total_deaths_per_million"] *= 100
+
+    return render(request, "visualization/top5_radar.html", {
+        "labels": top5_countries.index.tolist(),
+        "cases": top5_countries["total_cases"].tolist(),
+        "deaths": top5_countries["total_deaths"].tolist(),
+        "cases_per_million": top5_countries["total_cases_per_million"].tolist(),
+        "deaths_per_million": top5_countries["total_deaths_per_million"].tolist()
+    })
 
 def max_diff(request: HttpRequest) -> HttpResponse:
     # TODO: Implement max_diff view

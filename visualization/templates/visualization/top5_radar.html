@@ -1,53 +1,71 @@
 
+{% extends "visualization/layout.html" %}
+
+{% block heading %}Top 5 Radar{% endblock heading %}
+{% block description %}
+  A radar chart visualization comparing data of the top five countries with the most total cases.
+{% endblock description %}
+
 {% block content %}
-<div id="container" style="width: 75%;">
+<div id="container" class="graph">
   <canvas id="radar-chart"></canvas>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
 <script>
-
-  var config = {
-    type: 'radar',
-    data: {
-      datasets: [
-        {
-            label: "Cases (in ten thousands)",
-            data: {{ cases|safe }},
-            borderColor: '#7077ff',
-            //backgroundColor: '#7077ff',
+    var config = {
+        type: 'radar',
+        data: {
+            datasets: [
+                {
+                    label: "Cases (in ten thousands)",
+                    data: {{ cases|safe }},
+                    borderColor: '#7077ff',
+                },
+                {
+                    label: "Deaths (in thousands)",
+                    data: {{ deaths|safe }},
+                    borderColor: '#ff4242',
+                },
+                {
+                    label: "Cases per Million",
+                    data: {{ cases_per_million|safe }},
+                    borderColor: 'green',
+                },
+                {
+                    label: "Deaths per Million * 100",
+                    data: {{ deaths_per_million|safe }},
+                    borderColor: 'purple',
+                }
+            ],
+            labels: {{ labels|safe }}
         },
-        {
-            label: "Deaths (in thousands)",
-            data: {{ deaths|safe }},
-            borderColor: '#ff4242',
-            //backgroundColor: '#ff4242',
-        },
-        {
-            label: "Cases per Million",
-            data: {{ cases_per_million|safe }},
-            borderColor: 'green',
-            //backgroundColor: 'green',
-        },
-        {
-            label: "Deaths per Million * 100",
-            data: {{ deaths_per_million|safe }},
-            borderColor: 'purple',
-            //backgroundColor: 'purple',
+        options: {
+            responsive: true,
+            tooltips: {
+                callbacks: {
+                    label: function(tooltipItem, data) {
+                        var label = data.datasets[tooltipItem.datasetIndex].label || '';
+                        if (label) {
+                            label += ': '
+                        }
+                        var value = tooltipItem.yLabel;
+                        if (Number.isInteger(value)) {
+                            label += value; // No formatting for integers
+                        } else {
+                            label += parseFloat(value).toFixed(2); // Formatting for floats
+                        }
+                        return label;
+                    }
+                }
+            }
         }
-      ],
-      labels: {{ labels|safe }}
-    },
-    options: {
-      responsive: true
-    }
-  };
+    };
 
-  window.onload = function() {
-    var ctx = document.getElementById('radar-chart').getContext('2d');
-    window.myRadar = new Chart(ctx, config);
-  };
-
+    window.onload = function() {
+        var ctx = document.getElementById('radar-chart').getContext('2d');
+        window.myRadar = new Chart(ctx, config);
+    };
 </script>
 
 {% endblock %}

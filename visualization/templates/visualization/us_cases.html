@@ -13,67 +13,78 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
 <script>
-
-  var config = {
-    type: 'line',
-    data: {
-      datasets: [
-        {
-            label: 'Total Cases',
-            data: {{ total_cases|safe }},
-            borderColor: '#ff4242',
-            backgroundColor: '#ff4242',
-            fill: false,
-            yAxisID: 'totalYAxis'
+    var config = {
+        type: 'line',
+        data: {
+            datasets: [
+                {
+                    label: 'Total Cases',
+                    data: {{ total_cases|safe }},
+                    borderColor: '#ff4242',
+                    backgroundColor: '#ff4242',
+                    fill: false,
+                    yAxisID: 'totalYAxis'
+                },
+                {
+                    label: 'New Cases',
+                    data: {{ new_cases|safe }},
+                    borderColor: '#7077ff',
+                    backgroundColor: '#7077ff',
+                    fill: false,
+                    yAxisID: 'newYAxis'
+                }
+            ],
+            labels: {{ labels|safe }}
         },
-        {
-            label: 'New Cases',
-            data: {{ new_cases|safe }},
-            borderColor: '#7077ff',
-            backgroundColor: '#7077ff',
-            fill: false,
-            yAxisID: 'newYAxis'
-        }
-      ],
-      labels: {{ labels|safe }}
-    },
-    options: {
-      responsive: true,
-      scales: {
-        yAxes: [
-          {
-            id: 'totalYAxis',
-            type: 'linear',
-            position: 'left',
-            scaleLabel: {
-              display: true,
-              labelString: 'Total Cases',
-              fontColor: '#ff4242'
+        options: {
+            responsive: true,
+            scales: {
+                yAxes: [
+                    {
+                        id: 'totalYAxis',
+                        type: 'linear',
+                        position: 'left',
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Total Cases',
+                            fontColor: '#ff4242'
+                        }
+                    },
+                    {
+                        id: 'newYAxis',
+                        type: 'linear',
+                        position: 'right',
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'New Cases',
+                            fontColor: '#7077ff'
+                        },
+                        gridLines: {
+                            drawOnChartArea: false,
+                        },
+                    },
+                ]
+            },
+            tooltips: {
+                callbacks: {
+                    label: function(tooltipItem, data) {
+                        var label = data.datasets[tooltipItem.datasetIndex].label || '';
+                        if (label) {
+                            label += ': '
+                        }
+                        var value = tooltipItem.yLabel;
+                        label += Math.round(value);
+                        return label;
+                    }
+                }
             }
-          },
-          {
-            id: 'newYAxis',
-            type: 'linear',
-            position: 'right',
-            scaleLabel: {
-              display: true,
-              labelString: 'New Cases',
-              fontColor: '#7077ff'
-            },
-            gridLines: {
-              drawOnChartArea: false,
-            },
-          },
-        ]
-      }
-    }
-  };
+        }
+    };
 
-  window.onload = function() {
-    var ctx = document.getElementById('line-chart').getContext('2d');
-    window.myLine = new Chart(ctx, config);
-  };
-
+    window.onload = function() {
+        var ctx = document.getElementById('line-chart').getContext('2d');
+        window.myLine = new Chart(ctx, config);
+    };
 </script>
 
 {% endblock %}

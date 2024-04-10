@@ -1,6 +1,9 @@
+{% extends "visualization/layout.html" %}
+
+{% block heading %}Highest Average Cases and Deaths in One Month{% endblock heading %}
 
 {% block content %}
-<div id="container" style="width: 75%;">
+<div id="container" class="graph">
   <canvas id="bar-chart"></canvas>
 </div>
 
@@ -14,22 +17,28 @@
         {
             label: 'Cases that Month',
             data: {{ new_cases|safe }},
-            borderColor: '#7077ff',
             backgroundColor: '#7077ff',
-            fill: false,
+            stack: 'stack1'
         },
         {
             label: 'Deaths that Month',
             data: {{ new_deaths|safe }},
-            borderColor: '#ff4242',
             backgroundColor: '#ff4242',
-            fill: false,
+            stack: 'stack1'
         }
       ],
       labels: {{ labels|safe }}
     },
     options: {
-      responsive: true
+      responsive: true,
+      scales: {
+        xAxes: [{
+          stacked: true
+        }],
+        yAxes: [{
+          stacked: true
+        }]
+      }
     }
   };
 

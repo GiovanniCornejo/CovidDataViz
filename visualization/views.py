@@ -78,7 +78,6 @@ def top5_radar(request: HttpRequest) -> HttpResponse:
     `cases_per_million`: Cases per million.
     `deaths_per_million`: Deaths per million * 100 for each country (for scaling).
     """
-
     # Filter out non-country locations
     df = covid_df[(covid_df["location"] != "International") & (covid_df["location"] != "World")] 
 
@@ -99,9 +98,27 @@ def top5_radar(request: HttpRequest) -> HttpResponse:
     })
 
 def max_diff(request: HttpRequest) -> HttpResponse:
-    # TODO: Implement max_diff view
-    print("TODO: Implement max_diff view")
-    return render(request, "visualization/max_diff.html")
+    """
+    Generates a bar graph visualization for the difference in the total number of new cases in the 
+    top 5 countries with the most total cases before (including May) and after May (starting June).
+
+    Return:
+    `labels`: The country names.
+    `differences`: The difference between the total cases before and after May (absolute values)
+    """
+    # Filter out non-country locations
+    df = covid_df[(covid_df["location"] != "International") & (covid_df["location"] != "World")] 
+
+    before_may_cases = df[df["month"] <= 5].groupby("location")["new_cases"].max()
+    after_may_cases = df[df["month"] > 5].groupby("location")["new_cases"].max()
+    differences = (after_may_cases - before_may_cases).abs()
+
+    top5_countries = differences.nlargest(5)
+
+    return render(request, "visualization/max_diff.html", {
+        "labels": top5_countries.index.tolist(),
+        "differences": top5_countries.tolist()
+    })
 
 def positive_rates(request: HttpRequest) -> HttpResponse:
     # TODO: Implement positive_rates view

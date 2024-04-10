@@ -16,3 +16,10 @@
   display: flex;
   align-items: center;
 }
+
+/* Custom styles for smaller screens */
+@media (max-width: 768px) {
+  * {
+    font-size: 0.8rem;
+  }
+}
